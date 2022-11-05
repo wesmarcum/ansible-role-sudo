@@ -1,0 +1,9 @@
+---
+sudoers_dir_path: "/etc/sudoers.d"
+sudoers_path: "/etc/sudoers"
+sudoers_owner: "root"
+sudoers_group: "root"
+visudo_path: "/usr/sbin/visudo"
+sudoreplay_path: "/usr/bin/sudoreplay"
+shutdown_path: "/usr/bin/shutdown,/usr/sbin/shutdown,/sbin/shutdown"
+reboot_path: "/usr/bin/reboot,/usr/sbin/reboot,/sbin/reboot"

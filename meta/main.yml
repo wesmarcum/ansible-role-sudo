@@ -1,0 +1,27 @@
+---
+galaxy_info:
+  role_name: sudo
+  namespace: wesmarcum
+  author: Wes Marcum
+  description: Configure sudo for Linux and FreeBSD.
+  license: MIT
+  min_ansible_version: 2.9
+  platforms:
+    - name: ArchLinux
+      versions:
+        - any
+    - name: Debian
+      versions:
+        - buster
+        - bullseye
+    - name: FreeBSD
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+  galaxy_tags:
+    - sudo
+    - security
+    - server
+    - system
+  dependencies: []

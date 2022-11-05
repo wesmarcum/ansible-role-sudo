@@ -1,0 +1,36 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  become: false
+
+  tasks:
+    - name: Init pacman key
+      ansible.builtin.raw: /usr/bin/pacman-key --init
+      changed_when: false
+
+    - name: Check for python
+      ansible.builtin.raw: test -e /usr/bin/python
+      changed_when: false
+      failed_when: false
+      register: check_python
+
+    - name: Update keyring
+      ansible.builtin.raw: pacman -Sy --noconfirm archlinux-keyring
+      changed_when: false
+
+    - name: Update packages and install python
+      ansible.builtin.raw: pacman -Syu --noconfirm python
+      when: check_python.rc != 0
+
+    - name: Install sudo
+      ansible.builtin.package:
+        name: sudo
+        state: present
+
+    - name: Create molecule test user
+      ansible.builtin.user:
+        name: molecule
+        comment: molecule test user
+        shell: /bin/bash
+        state: present

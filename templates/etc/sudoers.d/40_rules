@@ -1,0 +1,8 @@
+# managed by ansible
+# generated for {{ ansible_fqdn }}
+
+{# Custom sudo rules, format: #}
+{# user host = (runas user:runas group) tag:command list #}
+{% for rule in sudo_rules %}
+{{ rule.name }} {{ rule.host }} = ({{ rule.runas_user | default('root') }}{% if rule.runas_group is defined %}:{{ rule.runas_group }}{% endif %}) {% if rule.tag is defined %}{{ rule.tag }}:{% endif %}{{ rule.commands | join(',') }}
+{% endfor %}

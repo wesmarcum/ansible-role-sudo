@@ -1,0 +1,10 @@
+---
+extends: default
+
+rules:
+  comments-indentation: disable
+  line-length:
+    max: 250
+    level: warning
+  truthy:
+    allowed-values: ['true', 'false', 'True', 'False', 'yes', 'no', 'Yes', 'No']

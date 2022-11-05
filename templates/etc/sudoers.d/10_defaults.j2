@@ -1,0 +1,41 @@
+# managed by ansible
+# generated for {{ ansible_fqdn }}
+
+# Global defaults
+Defaults	{{ sudo_defaults | join(',') }}
+Defaults        secure_path="{{ sudo_secure_path }}"
+{% if sudo_editor_path | length > 0 %}
+Defaults	editor={{ sudo_editor_path }}
+{% endif %}
+
+{# log output #}
+{% if sudo_log_output | bool %}
+# Log sudo output for sudoreplay
+Defaults        log_output
+Defaults!{{ "%-35s" | format(sudoreplay_path) }} !log_output
+Defaults!{{ "%-35s" | format(reboot_path) }} !log_output
+Defaults!{{ "%-35s" | format(shutdown_path) }} !log_output
+{% endif %}
+
+{# per object defaults #}
+{% if sudo_per_object_defaults | length > 0 %}
+# Per object defaults
+{%   for rule in sudo_per_object_defaults %}
+{%     if rule.type == 'user' %}
+{# user #}
+Defaults:{{ "%-25s %s" | format(rule.name, rule.options | join(',')) }}
+{%     elif rule.type == 'group' %}
+{# group #}
+Defaults:%{{ "%-24s %s" | format(rule.name, rule.options | join(',')) }}
+{%     elif rule.type == 'host' %}
+{# host #}
+Defaults@{{ "%-25s %s" | format(rule.name, rule.options | join(',')) }}
+{%     elif rule.type == 'command' %}
+{# command #}
+Defaults!{{ "%-25s %s" | format(rule.name, rule.options | join(',')) }}
+{%     else %}
+{# runas #}
+Defaults>{{ "%-25s %s" | format(rule.name, rule.options | join(',')) }}
+{%     endif %}
+{%   endfor %}
+{% endif %}

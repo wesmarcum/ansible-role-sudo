@@ -1,0 +1,6 @@
+# managed by ansible
+# generated for {{ ansible_fqdn }}
+
+{% for alias in sudo_runas_aliases %}
+Runas_Alias {{ alias.name | upper }} = {{ alias.users | join(',') }}
+{% endfor %}

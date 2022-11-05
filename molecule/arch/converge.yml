@@ -1,0 +1,101 @@
+---
+- name: Converge
+  hosts: all
+  become: false
+
+  pre_tasks:
+    - name: Wait for systemd to complete initialization
+      ansible.builtin.command: systemctl is-system-running
+      register: systemctl_status
+      until: >
+        'running' in systemctl_status.stdout or
+        'degraded' in systemctl_status.stdout
+      retries: 30
+      delay: 5
+      when: ansible_service_mgr == 'systemd'
+      changed_when: false
+      failed_when: systemctl_status.rc > 1
+
+    - name: Print ansible_facts
+      ansible.builtin.debug:
+        var: ansible_facts
+        verbosity: 2
+
+  roles:
+    - role: wesmarcum.sudo
+      vars:
+        sudo_users:
+          - molecule
+        sudo_log_output: true
+        sudo_per_object_defaults:
+          - type: user
+            name: test
+            options:
+              - "!lecture"
+              - "!insults"
+              - timestamp_timeout=10
+          - type: group
+            name: wheel
+            options:
+              - timestamp_timeout=2
+          - type: host
+            name: PRODUCTION
+            options:
+              - lecture=always
+          - type: command
+            name: "/sbin/fdisk"
+            options:
+              - lecture=always
+          - type: runas
+            name: "test"
+            options:
+              - lecture
+        sudo_user_aliases:
+          - name: BACKUPOPERATORS
+            users:
+              - backup
+              - devops
+          - name: TEST
+            users:
+              - molecule
+              - bob
+        sudo_command_aliases:
+          - name: BACKUP
+            commands:
+              - /sbin/dump
+              - /sbin/restore
+              - /usr/bin/mount
+        sudo_host_aliases:
+          - name: WWW
+            hosts:
+              - www[0-3]
+          - name: DMZ
+            hosts:
+              - 192.168.50.0/24
+              - 192.168.51.0/255.255.255.0
+              - WWW
+        sudo_runas_aliases:
+          - name: DB
+            users:
+              - postgres
+              - mysql
+        sudo_rules:
+          - name: "%sudo"
+            host: ALL
+            runas_user: ALL
+            runas_group: ALL
+            tag: NOPASSWD
+            commands:
+              - ALL
+          - name: devops
+            host: DMZ
+            runas_user: root
+            commands:
+              - BACKUP
+          - name: devops
+            host: DMZ
+            runas_user: root
+            tag: NOPASSWD
+            commands:
+              - /sbin/reboot
+              - /sbin/shutdown

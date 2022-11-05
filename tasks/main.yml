@@ -1,0 +1,129 @@
+---
+- name: Set OS specific variables
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - default.yml
+      paths:
+        - vars
+
+# - name: Include OS specific tasks
+  # ansible.builtin.include_tasks: "{{ lookup('ansible.builtin.first_found', params) }}"
+  # vars:
+    # params:
+      # files:
+        # - '{{ ansible_distribution }}.yml'
+        # - '{{ ansible_os_family }}.yml'
+        # - default.yml
+      # paths:
+        # - tasks
+
+- name: Install sudo
+  ansible.builtin.package:
+    name: sudo
+    state: present
+  become: true
+
+- name: Check for sudo group
+  ansible.builtin.group:
+    name: "{{ sudo_group }}"
+    state: present
+  become: true
+
+- name: Add users to sudo group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: "{{ sudo_group }}"
+    append: yes
+  loop: "{{ sudo_users }}"
+  when: sudo_users | length > 0
+  become: true
+
+- name: Add sudo group permissions
+  ansible.builtin.lineinfile:
+    path: "{{ sudoers_path }}"
+    state: present
+    regexp: '%{{ sudo_group }}'
+    line: '%{{ sudo_group }}   ALL=(ALL:ALL) {% if sudo_group_nopasswd | bool %}NOPASSWD:{% endif %}ALL'
+    validate: "{{ visudo_path }} -cf %s"
+  become: true
+
+- name: Template defaults file
+  ansible.builtin.template:
+    src: "templates/etc/sudoers.d/10_defaults.j2"
+    dest: "{{ sudoers_dir_path }}/10_defaults"
+    owner: "{{ sudoers_owner }}"
+    group: "{{ sudoers_group }}"
+    mode: '0440'
+    force: yes
+    validate: "{{ visudo_path }} -cf %s"
+  become: true
+
+- name: Copy proxy options file
+  ansible.builtin.copy:
+    src: "files/etc/sudoers.d/20_proxy"
+    dest: "{{ sudoers_dir_path }}/20_proxy"
+    owner: "{{ sudoers_owner }}"
+    group: "{{ sudoers_group }}"
+    mode: '0440'
+    force: yes
+  when: sudo_keep_proxy | bool
+  become: true
+
+- name: Template user aliases
+  ansible.builtin.template:
+    src: "templates/etc/sudoers.d/30_user_aliases"
+    dest: "{{ sudoers_dir_path }}/30_user_aliases"
+    owner: "{{ sudoers_owner }}"
+    group: "{{ sudoers_group }}"
+    mode: '0440'
+    validate: "{{ visudo_path }} -cf %s"
+  when: sudo_user_aliases | length > 0
+  become: true
+
+- name: Template command aliases
+  ansible.builtin.template:
+    src: "templates/etc/sudoers.d/30_command_aliases"
+    dest: "{{ sudoers_dir_path }}/30_command_aliases"
+    owner: "{{ sudoers_owner }}"
+    group: "{{ sudoers_group }}"
+    mode: '0440'
+    validate: "{{ visudo_path }} -cf %s"
+  when: sudo_command_aliases | length > 0
+  become: true
+
+- name: Template host aliases
+  ansible.builtin.template:
+    src: "templates/etc/sudoers.d/30_host_aliases"
+    dest: "{{ sudoers_dir_path }}/30_host_aliases"
+    owner: "{{ sudoers_owner }}"
+    group: "{{ sudoers_group }}"
+    mode: '0440'
+    validate: "{{ visudo_path }} -cf %s"
+  when: sudo_host_aliases | length > 0
+  become: true
+
+- name: Template runas aliases
+  ansible.builtin.template:
+    src: "templates/etc/sudoers.d/30_runas_aliases"
+    dest: "{{ sudoers_dir_path }}/30_runas_aliases"
+    owner: "{{ sudoers_owner }}"
+    group: "{{ sudoers_group }}"
+    mode: '0440'
+    validate: "{{ visudo_path }} -cf %s"
+  when: sudo_runas_aliases | length > 0
+  become: true
+
+- name: Template sudo rules
+  ansible.builtin.template:
+    src: "templates/etc/sudoers.d/40_rules"
+    dest: "{{ sudoers_dir_path }}/40_rules"
+    owner: "{{ sudoers_owner }}"
+    group: "{{ sudoers_group }}"
+    mode: '0440'
+    validate: "{{ visudo_path }} -cf %s"
+  when: sudo_rules | length > 0
+  become: true

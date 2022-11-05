@@ -1,0 +1,9 @@
+---
+sudoers_dir_path: "/usr/local/etc/sudoers.d"
+sudoers_path: "/usr/local/etc/sudoers"
+sudoers_owner: "root"
+sudoers_group: "wheel"
+visudo_path: "/usr/local/sbin/visudo"
+sudoreplay_path: "/usr/local/bin/sudoreplay"
+shutdown_path: "/sbin/shutdown"
+reboot_path: "/sbin/reboot"
