@@ -1,5 +1,9 @@
 Ansible Role: sudo
 ==================
+[![Galaxy Role][badge-galaxy]][link-galaxy]
+[![Ansible Quality Score][badge-quality]][link-galaxy]
+[![MIT licensed][badge-license]][link-license]
+[![CI][badge-gh-actions]][link-gh-actions]
 
 Configure sudo policy for Linux and FreeBSD.
 
@@ -160,3 +164,11 @@ Author Information
 ------------------
 
 https://github.com/wesmarcum
+
+[badge-license]: https://img.shields.io/badge/license-MIT-green?
+[link-license]: https://github.com/wesmarcum/ansible-role-sudo/blob/main/LICENSE
+[badge-gh-actions]: https://github.com/wesmarcum/ansible-role-sudo/workflows/CI/badge.svg?event=push
+[link-gh-actions]: https://github.com/wesmarcum/ansible-role-sudo/actions?query=workflow%3ACI
+[badge-galaxy]: https://img.shields.io/badge/role-sudo-blue
+[link-galaxy]: https://galaxy.ansible.com/wesmarcum/sudo
+[badge-quality]: https://img.shields.io/ansible/quality/60854
