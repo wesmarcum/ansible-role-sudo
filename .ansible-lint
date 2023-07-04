@@ -1,4 +1,8 @@
 ---
+exclude_paths:
+  - meta/main.yml
+  - handlers/main.yml
+  - molecule/
 skip_list:
   - 'yaml'
   - 'role-name'
